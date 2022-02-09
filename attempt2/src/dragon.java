@@ -12,18 +12,27 @@ public class dragon {
             System.out.println("The other dragon is greedy and hungry and will eat you on sight");
             System.out.println("Which cave will you go into? (1 or 2)");
 
-            Scanner sc = new Scanner(System.in);
-            int check = sc.nextInt();
-            if (check == 1) {
-                System.out.println("You approach the cave...");
-                System.out.println("It is dark and spooky...");
-                System.out.println("A large dragon jumps out in front of you! He opens his jaws and...");
-                System.out.println("Gobbles you down in one bite!");
-            } else {
-                System.out.println("You approach the cave...");
-                System.out.println("A gentle light emanates from within...");
-                System.out.println("A glimmering golden dragon emerges...");
-                System.out.println("They provide you a gift of treasure!");
+
+            try {
+                Scanner sc = new Scanner(System.in);
+                int check = sc.nextInt();
+                if (check == 1) {
+                    System.out.println("You approach the cave...");
+                    System.out.println("It is dark and spooky...");
+                    System.out.println("A large dragon jumps out in front of you! He opens his jaws and...");
+                    System.out.println("Gobbles you down in one bite!");
+                } else {
+                    if (check == 2) {
+                        System.out.println("You approach the cave...");
+                        System.out.println("A gentle light emanates from within...");
+                        System.out.println("A glimmering golden dragon emerges...");
+                        System.out.println("They provide you a gift of treasure!");
+                    }
+
+                }
+            } catch (Exception e) {
+                System.out.println("Error. Exception encountered.");
+                return;
             }
         }
     }

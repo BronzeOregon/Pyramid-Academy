@@ -13,6 +13,7 @@ public class main {
 
         System.out.println("Hello! What is your name?");
 
+
         Scanner sc = new Scanner(System.in);
         Scanner ac = new Scanner(System.in);
         String name = sc.nextLine();
@@ -22,11 +23,27 @@ public class main {
         int guesses = 1;
 
         while (guesses < 7) {
-            int guess = sc.nextInt();
+            int guess = 0;
+
+            try
+            {
+                guess = sc.nextInt();
+            } catch (Exception e) {
+                System.out.println("Error. Exception.");
+            }
+
             if (guess == guessthis) {
                 System.out.println("Good job, " + name + "! You guessed my number in " + guesses + " guesses!");
                 System.out.println("Would you like to play again? (y or n)");
-                String answer = ac.nextLine();
+
+                String answer = new String();
+
+                try {
+                    answer = ac.nextLine();
+                } catch (Exception e) {
+                    System.out.println("Error. Exception.");
+                }
+
                 String exit = "n";
                 String again = "y";
 
