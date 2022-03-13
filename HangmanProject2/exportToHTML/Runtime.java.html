@@ -1,0 +1,351 @@
+<html>
+<head>
+<title>Runtime.java</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<style type="text/css">
+.s0 { color: #cc7832;}
+.s1 { color: #a9b7c6;}
+.s2 { color: #6897bb;}
+.s3 { color: #6a8759;}
+.s4 { color: #808080;}
+</style>
+</head>
+<body bgcolor="#2b2b2b">
+<table CELLSPACING=0 CELLPADDING=5 COLS=1 WIDTH="100%" BGCOLOR="#606060" >
+<tr><td><center>
+<font face="Arial, Helvetica" color="#000000">
+Runtime.java</font>
+</center></td></tr></table>
+<pre><span class="s0">import </span><span class="s1">java.awt.FlowLayout</span><span class="s0">;</span>
+<span class="s0">import </span><span class="s1">java.awt.image.BufferedImage</span><span class="s0">;</span>
+<span class="s0">import </span><span class="s1">java.io.*</span><span class="s0">;</span>
+<span class="s0">import </span><span class="s1">javax.imageio.ImageIO</span><span class="s0">;</span>
+<span class="s0">import </span><span class="s1">javax.swing.ImageIcon</span><span class="s0">;</span>
+<span class="s0">import </span><span class="s1">javax.swing.JFrame</span><span class="s0">;</span>
+<span class="s0">import </span><span class="s1">javax.swing.JLabel</span><span class="s0">;</span>
+<span class="s0">import </span><span class="s1">java.nio.file.Files</span><span class="s0">;</span>
+<span class="s0">import </span><span class="s1">java.nio.file.Path</span><span class="s0">;</span>
+<span class="s0">import </span><span class="s1">java.nio.file.Paths</span><span class="s0">;</span>
+<span class="s0">import </span><span class="s1">java.util.*</span><span class="s0">;</span>
+<span class="s0">import </span><span class="s1">java.util.stream.Collectors</span><span class="s0">;</span>
+<span class="s0">import </span><span class="s1">java.util.stream.Stream</span><span class="s0">;</span>
+
+<span class="s0">public class </span><span class="s1">Runtime {</span>
+
+
+
+    <span class="s0">static </span><span class="s1">ArrayList&lt;Character&gt; playerGuesses = </span><span class="s0">new </span><span class="s1">ArrayList&lt;&gt;()</span><span class="s0">;</span>
+    <span class="s0">static int </span><span class="s1">wrongGuesses = </span><span class="s2">0</span><span class="s0">;</span>
+    <span class="s0">static </span><span class="s1">String playerName</span><span class="s0">;</span>
+    <span class="s0">static int </span><span class="s1">playerScore = </span><span class="s2">0</span><span class="s0">;</span>
+    <span class="s0">static </span><span class="s1">File hiScore</span><span class="s0">;</span>
+    <span class="s0">static </span><span class="s1">Scanner hiSc</span><span class="s0">;</span>
+    <span class="s0">static </span><span class="s1">String hiName</span><span class="s0">;</span>
+    <span class="s0">static </span><span class="s1">String highScore</span><span class="s0">;</span>
+    <span class="s0">static boolean </span><span class="s1">loop = </span><span class="s0">true;</span>
+
+    <span class="s0">public static void </span><span class="s1">main(String[] args) </span><span class="s0">throws </span><span class="s1">IOException {</span>
+
+        <span class="s1">hiScore = </span><span class="s0">new </span><span class="s1">File(</span><span class="s3">&quot;./highScore.txt&quot;</span><span class="s1">)</span><span class="s0">;</span>
+        <span class="s1">hiSc = </span><span class="s0">new </span><span class="s1">Scanner(</span><span class="s3">&quot;./highScore.txt&quot;</span><span class="s1">)</span><span class="s0">;</span>
+
+        <span class="s0">try </span><span class="s1">{</span>
+            <span class="s1">hiName = Files.readAllLines(Paths.get(</span><span class="s3">&quot;./highScore.txt&quot;</span><span class="s1">)).get(</span><span class="s2">0</span><span class="s1">)</span><span class="s0">;</span>
+            <span class="s1">highScore = Files.readAllLines(Paths.get(</span><span class="s3">&quot;./highScore.txt&quot;</span><span class="s1">)).get(</span><span class="s2">1</span><span class="s1">)</span><span class="s0">;</span>
+        <span class="s1">} </span><span class="s0">catch </span><span class="s1">(Exception e)</span>
+        <span class="s1">{</span>
+            <span class="s1">System.out.println(</span><span class="s3">&quot;There is no current high score holder!&quot;</span><span class="s1">)</span><span class="s0">;;</span>
+        <span class="s1">}</span>
+
+        <span class="s1">System.out.println(</span><span class="s3">&quot;Current high score: &quot;</span><span class="s1">+highScore+</span><span class="s3">&quot;. Held by: &quot;</span><span class="s1">+hiName+</span><span class="s3">&quot;.&quot;</span><span class="s1">)</span><span class="s0">;</span>
+
+        <span class="s1">String word = pickWord()</span><span class="s0">;</span>
+
+        <span class="s1">Stream&lt;Character&gt; wordStream = word.chars()</span>
+                <span class="s1">.mapToObj(c-&gt;(</span><span class="s0">char</span><span class="s1">) c)</span><span class="s0">;</span>
+
+        <span class="s1">System.out.println(</span><span class="s3">&quot;What is your name?&quot;</span><span class="s1">)</span><span class="s0">;</span>
+
+        <span class="s1">playerName = getInput()</span><span class="s0">;</span>
+
+        <span class="s0">do</span><span class="s1">{</span>
+            <span class="s1">displayImage()</span><span class="s0">;</span>
+
+            <span class="s1">System.out.println()</span><span class="s0">;</span>
+            <span class="s0">if</span><span class="s1">(playerGuesses.isEmpty())</span>
+                <span class="s4">//print dashes to represent number of letters in word</span>
+            <span class="s1">{</span>
+                <span class="s1">System.out.print(wordStream.map(i-&gt; </span><span class="s3">&quot;-&quot;</span><span class="s1">).collect(Collectors.toList()))</span><span class="s0">;</span>
+                <span class="s1">System.out.println()</span><span class="s0">;</span>
+            <span class="s1">}</span>
+
+            <span class="s1">System.out.println(</span><span class="s3">&quot;Please enter a letter.&quot;</span><span class="s1">)</span><span class="s0">;</span>
+
+            <span class="s0">try </span><span class="s1">{</span>
+                <span class="s1">guessChecker(getInputChar()</span><span class="s0">, </span><span class="s1">word)</span><span class="s0">;</span>
+            <span class="s1">} </span><span class="s0">catch </span><span class="s1">(Exception e) {</span>
+                <span class="s1">System.out.println(</span><span class="s3">&quot;Please enter a single character&quot;</span><span class="s1">)</span><span class="s0">;</span>
+            <span class="s1">}</span>
+
+            <span class="s0">if</span><span class="s1">(playerGuesses.containsAll(convertStringToCharList(word)))</span>
+            <span class="s1">{</span>
+                <span class="s1">System.out.println(</span><span class="s3">&quot;You win!&quot;</span><span class="s1">)</span><span class="s0">;</span>
+                <span class="s1">System.out.println(</span><span class="s3">&quot;You scored: &quot;</span><span class="s1">+playerScore+</span><span class="s3">&quot; points!&quot;</span><span class="s1">)</span><span class="s0">;</span>
+                <span class="s1">System.out.println(</span><span class="s3">&quot;Would you like to play again to earn more points?&quot;</span><span class="s1">)</span><span class="s0">;</span>
+                <span class="s1">String response = getInput()</span><span class="s0">;</span>
+                <span class="s0">if</span><span class="s1">(response.equals(</span><span class="s3">&quot;yes&quot;</span><span class="s1">))</span>
+                <span class="s1">{</span>
+                    <span class="s1">word=pickWord()</span><span class="s0">;</span>
+                    <span class="s1">wordStream = word.chars()</span>
+                            <span class="s1">.mapToObj(c-&gt;(</span><span class="s0">char</span><span class="s1">) c)</span><span class="s0">;</span>
+                    <span class="s1">playerGuesses.clear()</span><span class="s0">;</span>
+                    <span class="s1">wrongGuesses=</span><span class="s2">0</span><span class="s0">;</span>
+                    <span class="s1">System.out.println(</span><span class="s3">&quot;Alright, let's play again! I've picked a new word!&quot;</span><span class="s1">)</span><span class="s0">;</span>
+                <span class="s1">} </span><span class="s0">if</span><span class="s1">(response.equals(</span><span class="s3">&quot;no&quot;</span><span class="s1">))</span>
+                <span class="s1">{</span>
+                    <span class="s1">scoreChecker()</span><span class="s0">;</span>
+                    <span class="s1">loop = </span><span class="s0">false;</span>
+                <span class="s1">} </span><span class="s0">else </span><span class="s1">{</span>
+                <span class="s1">System.out.println(</span><span class="s3">&quot;I'm sorry, I didn't get that!&quot;</span><span class="s1">)</span><span class="s0">;</span>
+
+            <span class="s1">}</span>
+
+            <span class="s1">} </span><span class="s0">else </span><span class="s1">{</span>
+                <span class="s1">System.out.println(</span><span class="s3">&quot;Please try to guess the word.&quot;</span><span class="s1">)</span><span class="s0">;</span>
+                <span class="s1">String guess = getInput()</span><span class="s0">;</span>
+                <span class="s0">if</span><span class="s1">(word.equals(guess))</span>
+                <span class="s1">{</span>
+                    <span class="s1">playerScore+=</span><span class="s2">10</span><span class="s0">;</span>
+                    <span class="s1">System.out.println(</span><span class="s3">&quot;That's correct! You win!&quot;</span><span class="s1">)</span><span class="s0">;</span>
+                    <span class="s1">System.out.println(</span><span class="s3">&quot;You scored: &quot;</span><span class="s1">+playerScore+</span><span class="s3">&quot; points!&quot;</span><span class="s1">)</span><span class="s0">;</span>
+                    <span class="s1">System.out.println(</span><span class="s3">&quot;Would you like to play again to earn more points?&quot;</span><span class="s1">)</span><span class="s0">;</span>
+                    <span class="s1">String response = getInput()</span><span class="s0">;</span>
+                    <span class="s0">if</span><span class="s1">(response.equals(</span><span class="s3">&quot;yes&quot;</span><span class="s1">))</span>
+                    <span class="s1">{</span>
+                        <span class="s1">word=pickWord()</span><span class="s0">;</span>
+                        <span class="s1">wordStream = word.chars()</span>
+                                <span class="s1">.mapToObj(c-&gt;(</span><span class="s0">char</span><span class="s1">) c)</span><span class="s0">;</span>
+                        <span class="s1">playerGuesses.clear()</span><span class="s0">;</span>
+                        <span class="s1">wrongGuesses=</span><span class="s2">0</span><span class="s0">;</span>
+                        <span class="s1">System.out.println(</span><span class="s3">&quot;Alright, let's play again! I've picked a new word!&quot;</span><span class="s1">)</span><span class="s0">;</span>
+                    <span class="s1">} </span><span class="s0">if</span><span class="s1">(response.equals(</span><span class="s3">&quot;no&quot;</span><span class="s1">))</span>
+                <span class="s1">{</span>
+                    <span class="s1">scoreChecker()</span><span class="s0">;</span>
+                    <span class="s1">loop = </span><span class="s0">false;</span>
+                <span class="s1">} </span><span class="s0">else </span><span class="s1">{</span>
+                    <span class="s1">System.out.println(</span><span class="s3">&quot;I'm sorry, I didn't get that!&quot;</span><span class="s1">)</span><span class="s0">;</span>
+
+                <span class="s1">}</span>
+                <span class="s1">} </span><span class="s0">else</span><span class="s1">{</span>
+                    <span class="s1">System.out.println(</span><span class="s3">&quot;Sorry, that's incorrect!&quot;</span><span class="s1">)</span><span class="s0">;</span>
+                <span class="s1">}</span>
+
+            <span class="s1">} </span><span class="s0">if</span><span class="s1">(wrongGuesses &gt;=</span><span class="s2">6</span><span class="s1">) {</span>
+                <span class="s1">System.out.println(</span><span class="s3">&quot;I'm sorry, your man is hanged!&quot;</span><span class="s1">)</span><span class="s0">;</span>
+                <span class="s1">System.out.println(</span><span class="s3">&quot;You scored: &quot;</span><span class="s1">+playerScore+</span><span class="s3">&quot; points!&quot;</span><span class="s1">)</span><span class="s0">;</span>
+                <span class="s1">scoreChecker()</span><span class="s0">;</span>
+                <span class="s1">loop = </span><span class="s0">false;</span>
+            <span class="s1">}</span>
+
+        <span class="s1">} </span><span class="s0">while </span><span class="s1">(loop)</span><span class="s0">;</span>
+        <span class="s1">System.exit(</span><span class="s2">0</span><span class="s1">)</span><span class="s0">;</span>
+    <span class="s1">}</span>
+
+    <span class="s0">public static boolean </span><span class="s1">guessChecker(Character x</span><span class="s0">, </span><span class="s1">String word)</span>
+    <span class="s1">{</span>
+
+        <span class="s0">try</span>
+        <span class="s1">{playerGuesses.add(x)</span><span class="s0">;</span>
+
+            <span class="s0">if</span><span class="s1">(!convertStringToCharList(word).contains(x))</span>
+            <span class="s1">{</span>
+                <span class="s1">wrongGuesses++</span><span class="s0">;</span>
+                <span class="s1">System.out.println(</span><span class="s3">&quot;That letter is not in the word!&quot;</span><span class="s1">)</span><span class="s0">;</span>
+            <span class="s1">} </span><span class="s0">else</span><span class="s1">{</span>
+                <span class="s1">playerScore++</span><span class="s0">;</span>
+                <span class="s1">System.out.println(</span><span class="s3">&quot;Yes! The word does contain &quot;</span><span class="s1">+x+</span><span class="s3">&quot;!&quot;</span><span class="s1">)</span><span class="s0">;</span>
+            <span class="s1">}</span>
+
+            <span class="s1">word.chars().mapToObj(c-&gt;(</span><span class="s0">char</span><span class="s1">) c).forEach(i-&gt;{</span>
+                    <span class="s0">if</span><span class="s1">(playerGuesses.contains(i)) {</span>
+                        <span class="s1">System.out.print(i)</span><span class="s0">;</span>
+                    <span class="s1">} </span><span class="s0">else </span><span class="s1">{</span>
+                        <span class="s1">System.out.print(</span><span class="s3">&quot;-&quot;</span><span class="s1">)</span><span class="s0">;</span>
+                    <span class="s1">}</span>
+            <span class="s1">})</span><span class="s0">;</span>
+
+            <span class="s1">System.out.println()</span><span class="s0">;</span>
+
+            <span class="s0">return true;</span>
+        <span class="s1">} </span><span class="s0">catch </span><span class="s1">(Exception e) {</span>
+            <span class="s0">return false;</span>
+        <span class="s1">}</span>
+    <span class="s1">}</span>
+
+    <span class="s0">public static char </span><span class="s1">getInputChar() {</span>
+        <span class="s1">Scanner input = </span><span class="s0">new </span><span class="s1">Scanner(System.in)</span><span class="s0">;</span>
+
+        <span class="s1">String guessInput</span><span class="s0">;</span>
+
+        <span class="s1">guessInput = input.nextLine()</span><span class="s0">;</span>
+
+        <span class="s0">return </span><span class="s1">guessInput.charAt(</span><span class="s2">0</span><span class="s1">)</span><span class="s0">;</span>
+    <span class="s1">}</span>
+
+    <span class="s0">public static </span><span class="s1">List&lt;Character&gt;</span>
+    <span class="s1">convertStringToCharList(String str) {</span>
+        <span class="s0">return new </span><span class="s1">AbstractList&lt;Character&gt;() {</span>
+
+            <span class="s1">@Override</span>
+            <span class="s0">public </span><span class="s1">Character get(</span><span class="s0">int </span><span class="s1">index) {</span>
+                <span class="s0">return </span><span class="s1">str.charAt(index)</span><span class="s0">;</span>
+            <span class="s1">}</span>
+
+            <span class="s1">@Override</span>
+            <span class="s0">public int </span><span class="s1">size() {</span>
+                <span class="s0">return </span><span class="s1">str.length()</span><span class="s0">;</span>
+            <span class="s1">}</span>
+        <span class="s1">}</span><span class="s0">;</span>
+    <span class="s1">}</span>
+
+    <span class="s0">public static </span><span class="s1">String pickWord() </span><span class="s0">throws </span><span class="s1">IOException {</span>
+
+        <span class="s1">List&lt;String&gt; words = Files.readAllLines(Path.of(</span><span class="s3">&quot;./words_alpha.txt&quot;</span><span class="s1">))</span><span class="s0">;</span>
+
+        <span class="s1">Random rand = </span><span class="s0">new </span><span class="s1">Random()</span><span class="s0">;</span>
+
+        <span class="s0">return </span><span class="s1">words.get(rand.nextInt(words.size()-</span><span class="s2">1</span><span class="s1">))</span><span class="s0">;</span>
+    <span class="s1">}</span>
+
+    <span class="s0">public static </span><span class="s1">String getInput() {</span>
+        <span class="s1">Scanner inSc = </span><span class="s0">new </span><span class="s1">Scanner(System.in)</span><span class="s0">;</span>
+
+        <span class="s1">String playerInput = inSc.nextLine()</span><span class="s0">;</span>
+
+        <span class="s0">return </span><span class="s1">playerInput</span><span class="s0">;</span>
+    <span class="s1">}</span>
+
+    <span class="s0">public static void </span><span class="s1">displayImage() </span><span class="s0">throws </span><span class="s1">IOException</span>
+    <span class="s1">{</span>
+        <span class="s1">BufferedImage img</span><span class="s0">;</span>
+        <span class="s1">ImageIcon icon</span><span class="s0">;</span>
+        <span class="s1">JFrame frame</span><span class="s0">;</span>
+        <span class="s1">JLabel lbl</span><span class="s0">;</span>
+        <span class="s0">switch </span><span class="s1">(wrongGuesses){</span>
+            <span class="s0">case </span><span class="s2">0</span><span class="s1">:</span>
+                <span class="s1">img=ImageIO.read(</span><span class="s0">new </span><span class="s1">File(</span><span class="s3">&quot;./Hangman_Gallows0.jpg&quot;</span><span class="s1">))</span><span class="s0">;</span>
+                <span class="s1">icon=</span><span class="s0">new </span><span class="s1">ImageIcon(img)</span><span class="s0">;</span>
+                <span class="s1">frame=</span><span class="s0">new </span><span class="s1">JFrame()</span><span class="s0">;</span>
+                <span class="s1">frame.setLayout(</span><span class="s0">new </span><span class="s1">FlowLayout())</span><span class="s0">;</span>
+                <span class="s1">frame.setSize(</span><span class="s2">400</span><span class="s0">,</span><span class="s2">400</span><span class="s1">)</span><span class="s0">;</span>
+                <span class="s1">lbl=</span><span class="s0">new </span><span class="s1">JLabel()</span><span class="s0">;</span>
+                <span class="s1">lbl.setIcon(icon)</span><span class="s0">;</span>
+                <span class="s1">frame.add(lbl)</span><span class="s0">;</span>
+                <span class="s1">frame.setVisible(</span><span class="s0">true</span><span class="s1">)</span><span class="s0">;</span>
+                <span class="s1">frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE)</span><span class="s0">;</span>
+                <span class="s0">break;</span>
+            <span class="s0">case </span><span class="s2">1</span><span class="s1">:</span>
+                <span class="s1">img=ImageIO.read(</span><span class="s0">new </span><span class="s1">File(</span><span class="s3">&quot;./Hangman_Gallows1.jpg&quot;</span><span class="s1">))</span><span class="s0">;</span>
+                <span class="s1">icon=</span><span class="s0">new </span><span class="s1">ImageIcon(img)</span><span class="s0">;</span>
+                <span class="s1">frame=</span><span class="s0">new </span><span class="s1">JFrame()</span><span class="s0">;</span>
+                <span class="s1">frame.setLayout(</span><span class="s0">new </span><span class="s1">FlowLayout())</span><span class="s0">;</span>
+                <span class="s1">frame.setSize(</span><span class="s2">400</span><span class="s0">,</span><span class="s2">400</span><span class="s1">)</span><span class="s0">;</span>
+                <span class="s1">lbl=</span><span class="s0">new </span><span class="s1">JLabel()</span><span class="s0">;</span>
+                <span class="s1">lbl.setIcon(icon)</span><span class="s0">;</span>
+                <span class="s1">frame.add(lbl)</span><span class="s0">;</span>
+                <span class="s1">frame.setVisible(</span><span class="s0">true</span><span class="s1">)</span><span class="s0">;</span>
+                <span class="s1">frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE)</span><span class="s0">;</span>
+                <span class="s0">break;</span>
+            <span class="s0">case </span><span class="s2">2</span><span class="s1">:</span>
+                <span class="s1">img=ImageIO.read(</span><span class="s0">new </span><span class="s1">File(</span><span class="s3">&quot;./Hangman_Gallows2.jpg&quot;</span><span class="s1">))</span><span class="s0">;</span>
+                <span class="s1">icon=</span><span class="s0">new </span><span class="s1">ImageIcon(img)</span><span class="s0">;</span>
+                <span class="s1">frame=</span><span class="s0">new </span><span class="s1">JFrame()</span><span class="s0">;</span>
+                <span class="s1">frame.setLayout(</span><span class="s0">new </span><span class="s1">FlowLayout())</span><span class="s0">;</span>
+                <span class="s1">frame.setSize(</span><span class="s2">400</span><span class="s0">,</span><span class="s2">400</span><span class="s1">)</span><span class="s0">;</span>
+                <span class="s1">lbl=</span><span class="s0">new </span><span class="s1">JLabel()</span><span class="s0">;</span>
+                <span class="s1">lbl.setIcon(icon)</span><span class="s0">;</span>
+                <span class="s1">frame.add(lbl)</span><span class="s0">;</span>
+                <span class="s1">frame.setVisible(</span><span class="s0">true</span><span class="s1">)</span><span class="s0">;</span>
+                <span class="s1">frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE)</span><span class="s0">;</span>
+                <span class="s0">break;</span>
+            <span class="s0">case </span><span class="s2">3</span><span class="s1">:</span>
+                <span class="s1">img=ImageIO.read(</span><span class="s0">new </span><span class="s1">File(</span><span class="s3">&quot;./Hangman_Gallows3.jpg&quot;</span><span class="s1">))</span><span class="s0">;</span>
+                <span class="s1">icon=</span><span class="s0">new </span><span class="s1">ImageIcon(img)</span><span class="s0">;</span>
+                <span class="s1">frame=</span><span class="s0">new </span><span class="s1">JFrame()</span><span class="s0">;</span>
+                <span class="s1">frame.setLayout(</span><span class="s0">new </span><span class="s1">FlowLayout())</span><span class="s0">;</span>
+                <span class="s1">frame.setSize(</span><span class="s2">400</span><span class="s0">,</span><span class="s2">400</span><span class="s1">)</span><span class="s0">;</span>
+                <span class="s1">lbl=</span><span class="s0">new </span><span class="s1">JLabel()</span><span class="s0">;</span>
+                <span class="s1">lbl.setIcon(icon)</span><span class="s0">;</span>
+                <span class="s1">frame.add(lbl)</span><span class="s0">;</span>
+                <span class="s1">frame.setVisible(</span><span class="s0">true</span><span class="s1">)</span><span class="s0">;</span>
+                <span class="s1">frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE)</span><span class="s0">;</span>
+                <span class="s0">break;</span>
+            <span class="s0">case </span><span class="s2">4</span><span class="s1">:</span>
+                <span class="s1">img=ImageIO.read(</span><span class="s0">new </span><span class="s1">File(</span><span class="s3">&quot;./Hangman_Gallows4.jpg&quot;</span><span class="s1">))</span><span class="s0">;</span>
+                <span class="s1">icon=</span><span class="s0">new </span><span class="s1">ImageIcon(img)</span><span class="s0">;</span>
+                <span class="s1">frame=</span><span class="s0">new </span><span class="s1">JFrame()</span><span class="s0">;</span>
+                <span class="s1">frame.setLayout(</span><span class="s0">new </span><span class="s1">FlowLayout())</span><span class="s0">;</span>
+                <span class="s1">frame.setSize(</span><span class="s2">400</span><span class="s0">,</span><span class="s2">400</span><span class="s1">)</span><span class="s0">;</span>
+                <span class="s1">lbl=</span><span class="s0">new </span><span class="s1">JLabel()</span><span class="s0">;</span>
+                <span class="s1">lbl.setIcon(icon)</span><span class="s0">;</span>
+                <span class="s1">frame.add(lbl)</span><span class="s0">;</span>
+                <span class="s1">frame.setVisible(</span><span class="s0">true</span><span class="s1">)</span><span class="s0">;</span>
+                <span class="s1">frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE)</span><span class="s0">;</span>
+                <span class="s0">break;</span>
+            <span class="s0">case </span><span class="s2">5</span><span class="s1">:</span>
+                <span class="s1">img=ImageIO.read(</span><span class="s0">new </span><span class="s1">File(</span><span class="s3">&quot;./Hangman_Gallows5.jpg&quot;</span><span class="s1">))</span><span class="s0">;</span>
+                <span class="s1">icon=</span><span class="s0">new </span><span class="s1">ImageIcon(img)</span><span class="s0">;</span>
+                <span class="s1">frame=</span><span class="s0">new </span><span class="s1">JFrame()</span><span class="s0">;</span>
+                <span class="s1">frame.setLayout(</span><span class="s0">new </span><span class="s1">FlowLayout())</span><span class="s0">;</span>
+                <span class="s1">frame.setSize(</span><span class="s2">400</span><span class="s0">,</span><span class="s2">400</span><span class="s1">)</span><span class="s0">;</span>
+                <span class="s1">lbl=</span><span class="s0">new </span><span class="s1">JLabel()</span><span class="s0">;</span>
+                <span class="s1">lbl.setIcon(icon)</span><span class="s0">;</span>
+                <span class="s1">frame.add(lbl)</span><span class="s0">;</span>
+                <span class="s1">frame.setVisible(</span><span class="s0">true</span><span class="s1">)</span><span class="s0">;</span>
+                <span class="s1">frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE)</span><span class="s0">;</span>
+                <span class="s0">break;</span>
+        <span class="s1">}</span>
+
+    <span class="s1">}</span>
+
+    <span class="s0">public static void </span><span class="s1">scoreChecker() </span><span class="s0">throws </span><span class="s1">IOException {</span>
+
+        <span class="s1">System.out.println(</span><span class="s3">&quot;Thank you for playing!&quot;</span><span class="s1">)</span><span class="s0">;</span>
+        <span class="s1">FileWriter hiScWriter = </span><span class="s0">new </span><span class="s1">FileWriter(</span><span class="s3">&quot;./highScore.txt&quot;</span><span class="s1">)</span><span class="s0">;</span>
+        <span class="s1">FileReader hiScReader = </span><span class="s0">new </span><span class="s1">FileReader(</span><span class="s3">&quot;./highScore.txt&quot;</span><span class="s1">)</span><span class="s0">;</span>
+                <span class="s0">if</span><span class="s1">(hiScore.length()==</span><span class="s2">0</span><span class="s1">)</span>
+                <span class="s1">{</span>
+                    <span class="s1">System.out.println(</span><span class="s3">&quot;It looks like you're the first person to play this!&quot;</span><span class="s1">)</span><span class="s0">;</span>
+                    <span class="s1">System.out.println(</span><span class="s3">&quot;Congratulations, &quot;</span><span class="s1">+playerName+</span><span class="s3">&quot;! You have the high score of: &quot; </span><span class="s1">+playerScore+ </span><span class="s3">&quot; points!&quot;</span><span class="s1">)</span><span class="s0">;</span>
+                    <span class="s0">try</span><span class="s1">{</span>
+                        <span class="s1">hiScWriter.write(</span><span class="s3">&quot;&quot;</span><span class="s1">+playerName+</span><span class="s3">&quot;</span><span class="s0">\n</span><span class="s3">&quot;</span><span class="s1">+playerScore+</span><span class="s3">&quot;&quot;</span><span class="s1">)</span><span class="s0">;</span>
+                        <span class="s1">hiScWriter.flush()</span><span class="s0">;</span>
+                        <span class="s1">hiScWriter.close()</span><span class="s0">;</span>
+                    <span class="s1">} </span><span class="s0">catch </span><span class="s1">(Exception e)</span>
+                    <span class="s1">{</span>
+                        <span class="s1">System.out.println(</span><span class="s3">&quot;There was an error writing to the high scores file!&quot;</span><span class="s1">)</span><span class="s0">;</span>
+                    <span class="s1">}</span>
+                <span class="s1">} </span><span class="s0">else if</span><span class="s1">(Integer.parseInt(hiSc.nextLine())&lt;playerScore)</span>
+                <span class="s1">{</span>
+                    <span class="s1">System.out.println(</span><span class="s3">&quot;You've beaten the high score, &quot;</span><span class="s1">+playerName+</span><span class="s3">&quot;! Congratulations!&quot;</span><span class="s1">)</span><span class="s0">;</span>
+                    <span class="s0">try</span><span class="s1">{</span>
+                        <span class="s1">hiScWriter.write(</span><span class="s3">&quot;&quot;</span><span class="s1">+playerName+</span><span class="s3">&quot;</span><span class="s0">\n</span><span class="s3">&quot;</span><span class="s1">+playerScore+</span><span class="s3">&quot;&quot;</span><span class="s1">)</span><span class="s0">;</span>
+                        <span class="s1">hiScWriter.flush()</span><span class="s0">;</span>
+                        <span class="s1">hiScWriter.close()</span><span class="s0">;</span>
+                    <span class="s1">} </span><span class="s0">catch </span><span class="s1">(Exception e)</span>
+                    <span class="s1">{</span>
+                        <span class="s1">System.out.println(</span><span class="s3">&quot;There was an error writing to the high scores file!&quot;</span><span class="s1">)</span><span class="s0">;</span>
+                    <span class="s1">}</span>
+
+                    <span class="s1">System.out.println(</span><span class="s3">&quot;Your high score has been recorded!&quot;</span><span class="s1">)</span><span class="s0">;</span>
+                <span class="s1">} </span><span class="s0">else </span><span class="s1">{</span>
+                    <span class="s1">System.out.println(</span><span class="s3">&quot;I'm sorry, &quot;</span><span class="s1">+playerName+</span><span class="s3">&quot;. It seems like you didn't beat &quot;</span><span class="s1">+hiName+</span><span class="s3">&quot;'s score!&quot;</span><span class="s1">)</span><span class="s0">;</span>
+                <span class="s1">}</span>
+            <span class="s1">}</span>
+
+
+
+    <span class="s1">}</span>
+</pre>
+</body>
+</html>

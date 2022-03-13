@@ -295,7 +295,7 @@ public class Runtime {
         System.out.println("Thank you for playing!");
         FileWriter hiScWriter = new FileWriter("./highScore.txt");
         FileReader hiScReader = new FileReader("./highScore.txt");
-                if(hiScore.length()==0)
+                if(!hiScore.exists())
                 {
                     System.out.println("It looks like you're the first person to play this!");
                     System.out.println("Congratulations, "+playerName+"! You have the high score of: " +playerScore+ " points!");
@@ -307,7 +307,7 @@ public class Runtime {
                     {
                         System.out.println("There was an error writing to the high scores file!");
                     }
-                } else if(Integer.parseInt(hiSc.nextLine())<playerScore)
+                } else if(Integer.parseInt(highScore)<playerScore)
                 {
                     System.out.println("You've beaten the high score, "+playerName+"! Congratulations!");
                     try{
