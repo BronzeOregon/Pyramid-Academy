@@ -1,20 +1,25 @@
 package org.genspark;
 
 import org.springframework.context.ApplicationContext;
+import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
-/**
- * Hello world!
- *
- */
+import java.util.Scanner;
+
 public class App 
 {
     public static void main( String[] args )
     {
 
-        ApplicationContext context = new ClassPathXmlApplicationContext("Spring.xml");
+        Scanner scanner = new Scanner(System.in);
+        String input = scanner.nextLine();
 
-        Student stu = (Student) context.getBean("schoolmember");
+        ApplicationContext context = new AnnotationConfigApplicationContext(AppConfig.class);
+
+        Student stu = (Student) context.getBean(Student.class);
+        Employee emp = (Employee) context.getBean(Employee.class);
         System.out.println(stu);
+        System.out.println(emp);
+
     }
 }

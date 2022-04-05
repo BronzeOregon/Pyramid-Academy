@@ -1,6 +1,8 @@
 package org.genspark;
 
-import org.springframework.context.annotation.Bean;
+import org.springframework.stereotype.Component;
+
+@Component
 
 public class Phone {
     private String mob;
@@ -20,7 +22,6 @@ public class Phone {
                 '}';
     }
 
-    @Bean
     public Phone phone(){
         return new Phone();
     }
